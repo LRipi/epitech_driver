@@ -45,6 +45,7 @@ static struct file_operations file_ops =
  */
 };
 
+/*
 static int my_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 {
     vmf->page = my_page_at_index(vmf->pgoff);
@@ -55,10 +56,13 @@ static int my_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 static const struct vm_operations_struct my_vm_ops = {
         .fault      = my_fault
 };
+*/
 
 /* Called when a process opens our device */
 static int device_open(struct inode *inode, struct file *file)
 {
+    struct my_device_data *my_data;
+
 	/* If device is open, return busy */
 	if (device_open_count)
 	{
@@ -68,6 +72,8 @@ static int device_open(struct inode *inode, struct file *file)
 	else
 	{
 		printk(KERN_ALERT "Epitech  Open \n");
+		my_data = container_of(inode->i_cdev, struct my_device_data, cdev);
+        file->private_data = my_data;
 		device_open_count++;
 	}
 
@@ -77,7 +83,7 @@ static int device_open(struct inode *inode, struct file *file)
 }
 
 /* When a process reads from our device, this gets called. */
-static ssize_t device_read(struct file *flip, char *buffer, size_t len, loff_t *offset)
+static ssize_t device_read(struct file *file, char *buffer, size_t size, loff_t *offset)
 {
     struct my_device_data *my_data = (struct my_device_data *) file->private_data;
     ssize_t len = min(my_data->size - *offset, size);
@@ -85,14 +91,14 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t len, loff_t *
     if (len <= 0)
         return 0;
     /* read data from my_data->buffer to user buffer */
-    if (copy_to_user(user_buffer, my_data->buffer + *offset, len))
+    if (copy_to_user(buffer, my_data->buffer + *offset, len))
         return -EFAULT;
     *offset += len;
     return len;
 }
 
 /* When a process writes from our device, this gets called. */
-static ssize_t device_write(struct file *flip, const char *buffer, size_t len, loff_t *offset)
+static ssize_t device_write(struct file *file, const char *buffer, size_t size, loff_t *offset)
 {
     struct my_device_data *my_data = (struct my_device_data *) file->private_data;
     ssize_t len = min(my_data->size - *offset, size);
@@ -100,7 +106,7 @@ static ssize_t device_write(struct file *flip, const char *buffer, size_t len, l
     if (len <= 0)
         return 0;
     /* read data from user buffer to my_data->buffer */
-    if (copy_from_user(my_data->buffer + *offset, user_buffer, len))
+    if (copy_from_user(my_data->buffer + *offset, buffer, len))
         return -EFAULT;
     *offset += len;
     return len;
