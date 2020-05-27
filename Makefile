@@ -23,6 +23,5 @@ unload_module:
 	# Clear the kernel log without echo
 	sudo dmesg -C
 
-# Ajoute le driver dans /dev
 create_nod:
 	sudo mknod /dev/Epitech_example c $(MAJOR) 0
