@@ -21,7 +21,7 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
-static int my_mmap(struct file *, struct vm_area_struct *);
+static int device_mmap(struct file *, struct vm_area_struct *);
 static long device_ioctl (struct file *, unsigned int, unsigned long);
 
 
@@ -53,7 +53,7 @@ static int my_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 
 static const struct vm_operations_struct my_vm_ops = {
         .fault      = my_fault
-}
+};
 
 /* Called when a process opens our device */
 static int device_open(struct inode *inode, struct file *file)
@@ -121,12 +121,9 @@ static long device_ioctl (struct file *file, unsigned int cmd, unsigned long arg
 
     switch(cmd) {
         case MY_IOCTL_IN:
-            if( copy_from_user(&mid, (my_ioctl_data *) arg,
-                               sizeof(my_ioctl_data)) )
+            if (copy_from_user(&mid, (my_ioctl_data *) arg, sizeof(my_ioctl_data)))
                 return -EFAULT;
-
             /* process data and execute command */
-
             break;
         default:
             return -ENOTTY;
