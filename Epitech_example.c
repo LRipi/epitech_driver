@@ -86,7 +86,7 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t size, loff_t 
     if (len <= 0)
         return 0;
     /* read data from my_data->buffer to user buffer */
-    if (copy_to_user(msg_buffer, my_data->buffer + *offset, len))
+    if (copy_to_user(msg_buffer, my_data->msg_buffer + *offset, len))
         return -EFAULT;
     *offset += len;
     return len;
