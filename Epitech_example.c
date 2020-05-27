@@ -102,7 +102,7 @@ static ssize_t device_write(struct file *flip, const char *buffer, size_t size, 
         return 0;
 
     /* read data from user buffer to my_data->buffer */
-    if (copy_from_user(my_data->msg_buffer + *offset, user_buffer, len))
+    if (copy_from_user(my_data->msg_buffer + *offset, msg_buffer, len))
         return -EFAULT;
 
     *offset += len;
