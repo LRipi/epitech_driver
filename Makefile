@@ -23,5 +23,17 @@ unload_module:
 	# Clear the kernel log without echo
 	sudo dmesg -C
 
+# Ajoute le driver dans /dev
 create_nod:
 	sudo mknod /dev/Epitech_example c $(MAJOR) 0
+
+test:
+	# We put a — in front of the rmmod command to tell make to ignore
+	# an error in case the module isn’t loaded.
+    -sudo rmmod Epitech_example
+    # Clear the kernel log without echo
+    sudo dmesg -C
+    # Insert the module
+    sudo insmod Epitech_example.ko
+    # Display the kernel log
+    dmesg
