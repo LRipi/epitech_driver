@@ -1,6 +1,6 @@
 obj-m += Epitech_example.o
 
-MAJOR=
+MAJOR= 240
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules

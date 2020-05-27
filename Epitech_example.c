@@ -4,6 +4,7 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 #include <linux/errno.h>
+#include <linux/cdev.h>
 
 
 
@@ -19,6 +20,10 @@ MODULE_VERSION("0.01");
 #define DEVICE_NAME "Epitech_example"
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 16
+
+struct my_device_data {
+    struct cdev cdev;
+};
 
 /* Prototypes for device functions */
 static int device_open(struct inode *, struct file *);
@@ -47,7 +52,9 @@ static struct file_operations file_ops =
 /* Called when a process opens our device */
 static int device_open(struct inode *inode, struct file *file) 
 {
-	/* If device is open, return busy */
+    struct my_device_data *my_data;
+
+    /* If device is open, return busy */
 	if (device_open_count) 
 	{
 		printk(KERN_ALERT " Epitech Could not Open \n");
@@ -56,6 +63,8 @@ static int device_open(struct inode *inode, struct file *file)
 	else
 	{
 		printk(KERN_ALERT "Epitech  Open \n");
+        my_data = container_of(inode->i_cdev, struct my_device_data, cdev);
+        file->private_data = my_data;
 		device_open_count++;
 	}
 
@@ -69,7 +78,9 @@ static int device_open(struct inode *inode, struct file *file)
 /* When a process reads from our device, this gets called. */
 static ssize_t device_read(struct file *flip, char *buffer, size_t len, loff_t *offset) 
 {
-	printk(KERN_ALERT "READ This operation is not supported.\n");
+    struct my_device_data *my_data;
+
+    my_data = (struct my_device_data *) file->private_data;
 	return -ENOSYS;
 }
 
@@ -86,6 +97,7 @@ static ssize_t device_write(struct file *flip, const char *buffer, size_t len, l
 static int device_release(struct inode *inode, struct file *file) 
 {
 	module_put(THIS_MODULE);
+    device_open_count--;
 	return 0;
 }
 
@@ -102,14 +114,10 @@ static int __init Epitech_example_init(void)
 
 	if (major_num < 0) {
 		printk(KERN_ALERT "Could not register device: %d\n", major_num);
-
 		return major_num;
-
 	} else {
 		printk(KERN_INFO  " Hello Epitech_example module loaded with device major number %d\n", major_num);
-
 		return 0;
-
 	}
 }
 
