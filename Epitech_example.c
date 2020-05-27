@@ -5,7 +5,7 @@
 #include <linux/uaccess.h>
 #include <linux/errno.h>
 #include <linux/cdev.h>
-
+#include "Epitech_ioctl.h"
 
 
 MODULE_LICENSE("GPL");
