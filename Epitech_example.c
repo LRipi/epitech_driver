@@ -44,6 +44,17 @@ static struct file_operations file_ops =
 	.mmap = device_mmap
 };
 
+static int my_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+{
+    vmf->page = my_page_at_index(vmf->pgoff);
+    get_page(vmf->page);
+    return 0;
+}
+
+static const struct vm_operations_struct my_vm_ops = {
+        .fault      = my_fault
+}
+
 /* Called when a process opens our device */
 static int device_open(struct inode *inode, struct file *file)
 {
