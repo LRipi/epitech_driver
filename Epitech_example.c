@@ -23,6 +23,8 @@ MODULE_VERSION("0.01");
 
 struct my_device_data {
     struct cdev cdev;
+    int size;
+    char msg_buffer[MSG_BUFFER_LEN];
 };
 
 /* Prototypes for device functions */
@@ -84,7 +86,7 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t size, loff_t 
     if (len <= 0)
         return 0;
     /* read data from my_data->buffer to user buffer */
-    if (copy_to_user(user_buffer, my_data->buffer + *offset, len))
+    if (copy_to_user(msg_buffer, my_data->buffer + *offset, len))
         return -EFAULT;
     *offset += len;
     return len;
