@@ -1,0 +1,7 @@
+#ifndef EPITECH_IOCTL_H_
+#define EPITECH_IOCTL_H_
+
+#define EPITECH_DRV_CLEAR_BUFFER 0
+#define EPITECH_DRV_SYNC_BARRIER 0
+
+#endif /* !EPITECH_IOCTL_H_ */
