@@ -80,7 +80,7 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t len, loff_t *
 {
     struct my_device_data *my_data;
 
-    my_data = (struct my_device_data *) file->private_data;
+    my_data = (struct my_device_data *) filp->private_data;
 	return -ENOSYS;
 }
 
