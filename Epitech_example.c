@@ -93,10 +93,20 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t size, loff_t 
 }
 
 /* When a process writes from our device, this gets called. */
-static ssize_t device_write(struct file *flip, const char *buffer, size_t len, loff_t *offset)
+static ssize_t device_write(struct file *flip, const char *buffer, size_t size, loff_t *offset)
 {
-	printk(KERN_ALERT "Write This operation is not supported.\n");
-	return -ENOSYS;
+    struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
+    ssize_t len = min(my_data->size - *offset, size);
+
+    if (len <= 0)
+        return 0;
+
+    /* read data from user buffer to my_data->buffer */
+    if (copy_from_user(my_data->msg_buffer + *offset, user_buffer, len))
+        return -EFAULT;
+
+    *offset += len;
+    return len;
 }
 
 

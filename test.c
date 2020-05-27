@@ -95,13 +95,10 @@ static int Consumer(int test)
 	}
 
 	/* We clear the kernel buffer */
-	/*
-	if( 0 !=  ioctl(c_fd, EPITECH_DRV_CLEAR_BUFFER))
-	{
-		printf("IOCTL unexpected return value \n");
-		return -EXIT_FAILURE;
-	}
-	 */
+	if( 0 !=  ioctl(c_fd, EPITECH_DRV_CLEAR_BUFFER)) {
+        printf("IOCTL unexpected return value \n");
+        return -EXIT_FAILURE;
+    }
 
 
 #ifdef TEST_1
