@@ -4,14 +4,14 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 #include <linux/errno.h>
-#include <asm/ioctl.h>
+// #include <asm/ioctl.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("TOTO");
 MODULE_DESCRIPTION("Example Module");
 MODULE_VERSION("0.01");
 
-#define MY_IOCTL_IN _IOC(_IOC_WRITE, 'k', 1, sizeof(my_ioctl_data))
+// #define MY_IOCTL_IN _IOC(_IOC_WRITE, 'k', 1, sizeof(my_ioctl_data))
 #define DEVICE_NAME "Epitech_example"
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 16
@@ -21,8 +21,8 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
-static int device_mmap(struct file *, struct vm_area_struct *);
-static long device_ioctl (struct file *, unsigned int, unsigned long);
+// static int device_mmap(struct file *, struct vm_area_struct *);
+// static long device_ioctl (struct file *, unsigned int, unsigned long);
 
 
 static int major_num;
@@ -39,9 +39,10 @@ static struct file_operations file_ops =
 	.read = device_read,
 	.write = device_write,
 	.open = device_open,
-	.release = device_release,
+	.release = device_release/*,
 	.ioctl = device_ioctl,
 	.mmap = device_mmap
+ */
 };
 
 static int my_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
@@ -112,7 +113,7 @@ static int device_release(struct inode *inode, struct file *file)
 	device_open_count--;
 	return 0;
 }
-
+/*
 static long device_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
 {
     struct my_device_data *my_data =
@@ -123,7 +124,6 @@ static long device_ioctl (struct file *file, unsigned int cmd, unsigned long arg
         case MY_IOCTL_IN:
             if (copy_from_user(&mid, (my_ioctl_data *) arg, sizeof(my_ioctl_data)))
                 return -EFAULT;
-            /* process data and execute command */
             break;
         default:
             return -ENOTTY;
@@ -136,6 +136,7 @@ static int device_mmap(struct file *filp, struct vm_area_struct *vma)
     vma->vm_ops = &my_vm_ops;
     return 0;
 }
+*/
 
 /* Fill buffer with our message */
 /* Set the msg_ptr to the buffer */
