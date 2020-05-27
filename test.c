@@ -12,7 +12,7 @@
 
 #include "Epitech_ioctl.h"
 
-#define USER_BUFFER_LEN 1024*1024*3 /* Your driver has the same space */ 
+#define USER_BUFFER_LEN 1024*1024*3 /* Your driver has the same space */
 
 
 #define DEVICE_NAME "/dev/Epitech_example"
@@ -95,11 +95,13 @@ static int Consumer(int test)
 	}
 
 	/* We clear the kernel buffer */
+	/*
 	if( 0 !=  ioctl(c_fd, EPITECH_DRV_CLEAR_BUFFER))
 	{
 		printf("IOCTL unexpected return value \n");
 		return -EXIT_FAILURE;
 	}
+	 */
 
 
 #ifdef TEST_1
