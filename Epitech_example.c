@@ -22,6 +22,11 @@ MODULE_VERSION("0.01");
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 16
 
+struct my_device_data {
+    struct cdev cdev;
+    int size;
+    char msg_buffer[MSG_BUFFER_LEN];
+};
 
 /* Prototypes for device functions */
 static int device_open(struct inode *, struct file *);
@@ -33,8 +38,7 @@ static int major_num;
 
 static int device_open_count = 0;
 
-static char msg_buffer[MSG_BUFFER_LEN] = {0};
-static ssize_t msg_size;
+static char msg_buffer[MSG_BUFFER_LEN];
 
 static char *msg_ptr;
 
@@ -51,6 +55,8 @@ static struct file_operations file_ops =
 /* Called when a process opens our device */
 static int device_open(struct inode *inode, struct file *file) 
 {
+    struct my_device_data *my_data;
+
     /* If device is open, return busy */
 	if (device_open_count) 
 	{
@@ -60,6 +66,8 @@ static int device_open(struct inode *inode, struct file *file)
 	else
 	{
 		printk(KERN_ALERT "Epitech  Open \n");
+        my_data = container_of(inode->i_cdev, struct my_device_data, cdev);
+        file->private_data = my_data;
 		device_open_count++;
 	}
 
@@ -73,41 +81,35 @@ static int device_open(struct inode *inode, struct file *file)
 /* When a process reads from our device, this gets called. */
 static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, loff_t *offset)
 {
-/*    ssize_t len = (ssize_t) min(size - *offset, size);
+    ssize_t len = (ssize_t) min(size - *offset, size);
 
+    printk(KERN_INFO "%lu\n", size);
+    printk(KERN_INFO "%lu\n", len);
+    printk(KERN_INFO "%s\n", buffer);
     if (len <= 0)
         return 0;
-    if (copy_to_user(buffer, buffer + *offset, len))
+    if (copy_to_user(buffer, msg_buffer, len))
         return -EFAULT;
     printk(KERN_INFO "%s\n", buffer);
     *offset += len;
-    return len;*/
-    int error_count = 0;
-    if ((error_count = copy_to_user(buffer, msg_buffer, msg_size))) {
-        printk(KERN_INFO "EBBChar: Sent %d characters to the user\n", msg_size);
-        return (msg_size = 0);
-    } else {
-        printk(KERN_INFO "EBBChar: Failed to send %d characters to the user\n", error_count);
-        return -EFAULT;
-    }
+    return len;
 }
 
 /* When a process writes from our device, this gets called. */
 static ssize_t device_write(struct file *flip, const char __user *buffer, size_t size, loff_t *offset)
 {
-    /*
     struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
     ssize_t len = min(my_data->size - *offset, size);
 
     if (len <= 0)
         return 0;
 
+    /* read data from user buffer to my_data->buffer */
     if (copy_from_user(my_data->msg_buffer + *offset, msg_buffer, len))
         return -EFAULT;
 
     *offset += len;
     return len;
-     */
 }
 
 
