@@ -5,6 +5,7 @@
 #include <linux/uaccess.h>
 #include <linux/errno.h>
 #include <linux/cdev.h>
+#include <linux/wait.h>
 #include <linux/sched.h>
 #include <asm/uaccess.h>
 #include "Epitech_ioctl.h"
@@ -86,9 +87,6 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
 {
     ssize_t len = (ssize_t) min(size - *offset, size);
 
-    printk(KERN_INFO "%lu\n", size);
-    printk(KERN_INFO "%lu\n", len);
-    printk(KERN_INFO "%s\n", buffer);
     if (len <= 0)
         return 0;
     interruptible_sleep_on(&my_queue);
