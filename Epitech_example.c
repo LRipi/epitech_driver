@@ -94,6 +94,7 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
         return 0;
     if (copy_to_user(buffer, msg_buffer + *offset, len))
         return -EFAULT;
+    kfree(msg_buffer);
     *offset += len;
     return len;
 }
@@ -117,7 +118,6 @@ static ssize_t device_write(struct file *flip, const char __user *buffer, size_t
 static int device_release(struct inode *inode, struct file *file) 
 {
 	module_put(THIS_MODULE);
-    kfree(msg_buffer);
     device_open_count--;
 	return 0;
 }
