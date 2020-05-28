@@ -5,6 +5,8 @@
 #include <linux/uaccess.h>
 #include <linux/errno.h>
 #include <linux/cdev.h>
+#include <linux/wait.h>
+#include <linux/sched.h>
 #include <asm/uaccess.h>
 #include "Epitech_ioctl.h"
 
