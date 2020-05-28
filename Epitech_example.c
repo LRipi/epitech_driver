@@ -129,14 +129,14 @@ static int device_release(struct inode *inode, struct file *file)
 
 static int device_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-    unsigned long offset = vma->vm_pgoff << PAGE_SHIFT;
+    printk(KERN_INFO "MMAP WORKS\n");
+    size_t size = vma->vm_end - vma->vm_start;
+    phys_addr_t offset = (phys_addr_t) vma->vm_pgoff << PAGE_SHIFT;
+    unsigned long pfn;
 
-    if (offset >= _&thinsp;_pa(high_memory) || (filp->f_flags & O_SYNC))
-        vma->vm_flags |= VM_IO;
-    vma->vm_flags |= VM_RESERVED;
-    if (remap_page_range(vma->vm_start, offset,
-                         vma->vm_end-vma->vm_start, vma->vm_page_prot))
-        return -EAGAIN;
+    /* Does it even fit in phys_addr_t? */
+    if (offset >> PAGE_SHIFT != vma->vm_pgoff)
+        return -EINVAL;
     return 0;
 }
 
