@@ -6,6 +6,8 @@
 #include <linux/errno.h>
 #include <linux/cdev.h>
 #include <asm/uaccess.h>
+#include <linux/sched.h>
+#include <linux/delay.h>
 #include "Epitech_ioctl.h"
 
 
@@ -98,16 +100,13 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
 /* When a process writes from our device, this gets called. */
 static ssize_t device_write(struct file *flip, const char __user *buffer, size_t size, loff_t *offset)
 {
-    struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
-    ssize_t len = min(my_data->size - *offset, size);
+    ssize_t len = min(size - *offset, size);
 
     if (len <= 0)
         return 0;
-
     /* read data from user buffer to my_data->buffer */
-    if (copy_from_user(my_data->msg_buffer + *offset, msg_buffer, len))
+    if (copy_from_user(buffer + *offset, msg_buffer, len))
         return -EFAULT;
-
     *offset += len;
     return len;
 }
