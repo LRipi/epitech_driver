@@ -81,7 +81,7 @@ static int device_open(struct inode *inode, struct file *file)
 static ssize_t device_read(struct file *flip, char *buffer, size_t size, loff_t *offset)
 {
     struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
-    ssize_t len = min(my_data->size - (ssize_t) *offset, size);
+    ssize_t len = (ssize_t) min(my_data->size - (ssize_t) *offset, size);
 
     printk(KERN_INFO "%lu\n", len);
     if (len <= 0)
