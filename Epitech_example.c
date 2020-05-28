@@ -7,6 +7,7 @@
 #include <linux/cdev.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
+#include <linux/sched/signal.h>
 #include <asm/uaccess.h>
 #include "Epitech_ioctl.h"
 
