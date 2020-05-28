@@ -124,12 +124,6 @@ static int device_release(struct inode *inode, struct file *file)
 
 static int __init Epitech_example_init(void) 
 {
-	/* Fill buffer with our message */
-	strncpy(msg_buffer, EXAMPLE_MSG, MSG_BUFFER_LEN);
-
-	/* Set the msg_ptr to the buffer */
-	msg_ptr = msg_buffer;
-
 	/* Try to register character device */
 	major_num = register_chrdev(0, DEVICE_NAME, &file_ops);
 
