@@ -51,8 +51,6 @@ static struct file_operations file_ops =
 /* Called when a process opens our device */
 static int device_open(struct inode *inode, struct file *file) 
 {
-    struct my_device_data *my_data;
-
     /* If device is open, return busy */
 	if (device_open_count) 
 	{
@@ -62,8 +60,6 @@ static int device_open(struct inode *inode, struct file *file)
 	else
 	{
 		printk(KERN_ALERT "Epitech  Open \n");
-        my_data = container_of(inode->i_cdev, struct my_device_data, cdev);
-        file->private_data = my_data;
 		device_open_count++;
 	}
 
@@ -97,18 +93,19 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
 /* When a process writes from our device, this gets called. */
 static ssize_t device_write(struct file *flip, const char __user *buffer, size_t size, loff_t *offset)
 {
+    /*
     struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
     ssize_t len = min(my_data->size - *offset, size);
 
     if (len <= 0)
         return 0;
 
-    /* read data from user buffer to my_data->buffer */
     if (copy_from_user(my_data->msg_buffer + *offset, msg_buffer, len))
         return -EFAULT;
 
     *offset += len;
     return len;
+     */
 }
 
 
