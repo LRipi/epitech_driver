@@ -26,7 +26,7 @@ MODULE_VERSION("0.01");
 #define DEVICE_NAME "Epitech_example"
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 1024 * 1024 * 3
-#define MY_IOCTL_IN _IOC(_IOC_WRITE, 'k', 1, sizeof(my_ioctl_data))
+// #define MY_IOCTL_IN _IOC(_IOC_WRITE, 'k', 1, sizeof(my_ioctl_data))
 
 struct my_device_data {
     struct cdev cdev;
@@ -130,14 +130,10 @@ static int my_ioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned 
 static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 #endif
 {
-    my_ioctl_data mid;
-
     switch(cmd) {
-        case MY_IOCTL_IN:
-            if (copy_from_user(&mid, (my_ioctl_data *) arg, sizeof(my_ioctl_data))  )
-                return -EFAULT;
-            /* process data and execute command */
-            break;
+        /*case MY_IOCTL_IN:
+            return -EFAULT;
+            break;*/
         default:
             return -ENOTTY;
     }
