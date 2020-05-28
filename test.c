@@ -119,8 +119,8 @@ static int Consumer(int test)
 		/* We test if we recieved the pattern */
 		if ((ret = memcmp( Consumer_array, PATTERN, USER_BUFFER_LEN )) != 0)
 		{
+            printf("%d\n", ret);
 			printf("Pattern memcmp failed \n");
-			printf("%d\n", ret);
 			return -EXIT_FAILURE;
 		}
 		else	
