@@ -22,11 +22,6 @@ MODULE_VERSION("0.01");
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 16
 
-struct my_device_data {
-    struct cdev cdev;
-    int size;
-    char msg_buffer[MSG_BUFFER_LEN];
-};
 
 /* Prototypes for device functions */
 static int device_open(struct inode *, struct file *);
@@ -38,7 +33,8 @@ static int major_num;
 
 static int device_open_count = 0;
 
-static char msg_buffer[MSG_BUFFER_LEN];
+static char msg_buffer[MSG_BUFFER_LEN] = {0};
+static ssize_t msg_size;
 
 static char *msg_ptr;
 
@@ -81,20 +77,21 @@ static int device_open(struct inode *inode, struct file *file)
 /* When a process reads from our device, this gets called. */
 static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, loff_t *offset)
 {
-    struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
-    ssize_t len = (ssize_t) min(size - *offset, size);
+/*    ssize_t len = (ssize_t) min(size - *offset, size);
 
-    printk(KERN_INFO "%lu\n", size);
-    printk(KERN_INFO "%lu\n", len);
-    printk(KERN_INFO "%s\n", buffer);
-    printk(KERN_INFO "%s\n", my_data->msg_buffer);
     if (len <= 0)
         return 0;
     if (copy_to_user(buffer, buffer + *offset, len))
         return -EFAULT;
     printk(KERN_INFO "%s\n", buffer);
     *offset += len;
-    return len;
+    return len;*/
+    int error_count = 0;
+
+    if (copy_to_user(buffer, msg_buffer, msg_size))
+        return (msg_size=0);
+    else
+        return -EFAULT;
 }
 
 /* When a process writes from our device, this gets called. */
