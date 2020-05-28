@@ -84,7 +84,7 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
     return len;*/
     int error_count = 0;
     if ((error_count = copy_to_user(buffer, msg_buffer, msg_size))) {
-        printk(KERN_INFO "EBBChar: Sent %d characters to the user\n", size_of_message);
+        printk(KERN_INFO "EBBChar: Sent %d characters to the user\n", msg_size);
         return (msg_size = 0);
     } else {
         printk(KERN_INFO "EBBChar: Failed to send %d characters to the user\n", error_count);
