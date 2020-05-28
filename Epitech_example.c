@@ -26,7 +26,6 @@ MODULE_VERSION("0.01");
 #define DEVICE_NAME "Epitech_example"
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 1024 * 1024 * 3
-// #define MY_IOCTL_IN _IOC(_IOC_WRITE, 'k', 1, sizeof(my_ioctl_data))
 
 struct my_device_data {
     struct cdev cdev;
@@ -39,11 +38,6 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char __user *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char __user *, size_t, loff_t *);
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35))
-static int my_ioctl(struct inode *, struct file *, unsigned int, unsigned long);
-#else
-static long my_ioctl(struct file *, unsigned int, unsigned long);
-#endif
 
 static int major_num;
 
@@ -61,12 +55,7 @@ static struct file_operations file_ops =
 	.read = device_read,
 	.write = device_write,
 	.open = device_open,
-	.release = device_release,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35))
-    .ioctl = my_ioctl
-#else
-    .unlocked_ioctl = my_ioctl
-#endif
+	.release = device_release
 };
 
 
@@ -105,7 +94,6 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
         return 0;
     if (copy_to_user(buffer, msg_buffer + *offset, len))
         return -EFAULT;
-    kfree(msg_buffer);
     *offset += len;
     return len;
 }
@@ -124,26 +112,12 @@ static ssize_t device_write(struct file *flip, const char __user *buffer, size_t
     return len;
 }
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35))
-static int my_ioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg)
-#else
-static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
-#endif
-{
-    switch(cmd) {
-        /*case MY_IOCTL_IN:
-            return -EFAULT;
-            break;*/
-        default:
-            return -ENOTTY;
-    }
-    return 0;
-}
 
 /* Called when a process closes our device */
 static int device_release(struct inode *inode, struct file *file) 
 {
 	module_put(THIS_MODULE);
+    kfree(msg_buffer);
     device_open_count--;
 	return 0;
 }
