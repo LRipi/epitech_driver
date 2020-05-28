@@ -86,7 +86,7 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
     printk(KERN_INFO "%lu\n", size);
     printk(KERN_INFO "%lu\n", len);
     printk(KERN_INFO "%s\n", buffer);
-    printk(KERN_INFO "%s\n", file->private_data->buffer);
+    printk(KERN_INFO "%s\n", flip->private_data->buffer);
     if (len <= 0)
         return 0;
     if (copy_to_user(buffer, buffer + *offset, len))
