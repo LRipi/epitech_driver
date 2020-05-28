@@ -21,7 +21,7 @@ MODULE_VERSION("0.01");
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 16
 
-struct my_device_data {
+static struct my_device_data {
     struct cdev cdev;
     int size;
     char msg_buffer[MSG_BUFFER_LEN];
