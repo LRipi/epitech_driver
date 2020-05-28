@@ -122,8 +122,7 @@ static long my_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
 
     switch(cmd) {
         case MY_IOCTL_IN:
-            if( copy_from_user(&mid, (my_ioctl_data *) arg,
-                               sizeof(my_ioctl_data)) )
+            if(copy_from_user(&mid, (my_ioctl_data *) arg, sizeof(my_ioctl_data)))
                 return -EFAULT;
             /* process data and execute command */
             break;
