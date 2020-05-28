@@ -31,3 +31,4 @@ build: all load_module create_nod
 re: unload_module clean
 	rm -rf /dev/Epitech_example
 	$(MAKE) build
+	gcc test.c -o test
