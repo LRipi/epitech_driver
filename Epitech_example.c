@@ -83,7 +83,7 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t size, loff_t 
     struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
     ssize_t len = min(my_data->size - (ssize_t) *offset, size);
 
-    printk(KERN_INFO "%d\n", len);
+    printk(KERN_INFO "%ui\n", len);
     if (len <= 0)
         return 0;
     /* read data from my_data->buffer to user buffer */
