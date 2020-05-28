@@ -45,7 +45,7 @@ static char msg_buffer[MSG_BUFFER_LEN];
 
 static char *msg_ptr;
 
-static wait_queue_head_t my_queue;
+DECLARE_WAIT_QUEUE_HEAD(my_queue);
 
 /* This structure points to all of the device functions */
 static struct file_operations file_ops = 
@@ -93,7 +93,7 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
     printk(KERN_INFO "%s\n", buffer);
     if (len <= 0)
         return 0;
-    sleep_on(&my_queue);
+    interruptible_sleep_on(&my_queue);
     if (copy_to_user(buffer, msg_buffer + *offset, len))
         return -EFAULT;
     printk(KERN_INFO "%s\n", buffer);
@@ -111,7 +111,7 @@ static ssize_t device_write(struct file *flip, const char __user *buffer, size_t
     if (copy_from_user(msg_buffer + *offset, buffer, len))
         return -EFAULT;
     *offset += len;
-    wake_up(&my_queue);
+    wake_up_interruptible(&my_queue);
     return len;
 }
 
@@ -129,7 +129,6 @@ static int __init Epitech_example_init(void)
 {
 	/* Try to register character device */
 	major_num = register_chrdev(0, DEVICE_NAME, &file_ops);
-    init_waitqueue_head (&my_queue);
 
 	if (major_num < 0) {
 		printk(KERN_ALERT "Could not register device: %d\n", major_num);
