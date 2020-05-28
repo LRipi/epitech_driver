@@ -6,6 +6,7 @@
 #include <linux/errno.h>
 #include <linux/cdev.h>
 #include <linux/slab.h>
+#include <linux/mm.h>
 #include <asm/uaccess.h>
 #include <asm/ioctl.h>
 #include <linux/wait.h>
@@ -38,6 +39,7 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char __user *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char __user *, size_t, loff_t *);
+static int device_mmap(struct file *, struct vm_area_struct *);
 
 static int major_num;
 
@@ -55,7 +57,8 @@ static struct file_operations file_ops =
 	.read = device_read,
 	.write = device_write,
 	.open = device_open,
-	.release = device_release
+	.release = device_release,
+	.mmap = device_mmap
 };
 
 
@@ -122,6 +125,19 @@ static int device_release(struct inode *inode, struct file *file)
 	module_put(THIS_MODULE);
     device_open_count--;
 	return 0;
+}
+
+static int device_mmap(struct file *filp, struct vm_area_struct *vma)
+{
+    unsigned long offset = vma->vm_pgoff << PAGE_SHIFT;
+
+    if (offset >= _&thinsp;_pa(high_memory) || (filp->f_flags & O_SYNC))
+        vma->vm_flags |= VM_IO;
+    vma->vm_flags |= VM_RESERVED;
+    if (remap_page_range(vma->vm_start, offset,
+                         vma->vm_end-vma->vm_start, vma->vm_page_prot))
+        return -EAGAIN;
+    return 0;
 }
 
 static int __init Epitech_example_init(void) 
