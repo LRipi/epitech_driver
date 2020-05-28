@@ -5,6 +5,7 @@
 #include <linux/uaccess.h>
 #include <linux/errno.h>
 #include <linux/cdev.h>
+#include <linux/slab.h>
 #include <asm/uaccess.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
@@ -41,7 +42,7 @@ static int major_num;
 
 static int device_open_count = 0;
 
-static char msg_buffer[MSG_BUFFER_LEN];
+static char *msg_buffer;
 
 static char *msg_ptr;
 
@@ -93,7 +94,7 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
     interruptible_sleep_on(&my_queue);
     if (copy_to_user(buffer, msg_buffer + *offset, len))
         return -EFAULT;
-    printk(KERN_INFO "%s\n", buffer);
+    kfree(msg_buffer);
     *offset += len;
     return len;
 }
@@ -105,6 +106,7 @@ static ssize_t device_write(struct file *flip, const char __user *buffer, size_t
 
     if (len <= 0)
         return 0;
+    msg_buffer = kmalloc(len, GFP_USER);
     if (copy_from_user(msg_buffer + *offset, buffer, len))
         return -EFAULT;
     *offset += len;
