@@ -26,7 +26,7 @@ unload_module:
 create_nod:
 	sudo mknod /dev/Epitech_example c $(MAJOR) 0
 
-build: all load_module
+build: all load_module create_nod
 
 re: unload_module clean
 	rm -rf /dev/Epitech_example
