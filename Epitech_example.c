@@ -7,6 +7,7 @@
 #include <linux/cdev.h>
 #include <linux/slab.h>
 #include <asm/uaccess.h>
+#include <asm/ioctl.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
 #include <linux/delay.h>
@@ -25,6 +26,7 @@ MODULE_VERSION("0.01");
 #define DEVICE_NAME "Epitech_example"
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 1024 * 1024 * 3
+#define MY_IOCTL_IN _IOC(_IOC_WRITE, 'k', 1, sizeof(my_ioctl_data))
 
 struct my_device_data {
     struct cdev cdev;
@@ -37,6 +39,7 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char __user *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char __user *, size_t, loff_t *);
+static long my_ioctl (struct file *, unsigned int, unsigned long);
 
 static int major_num;
 
@@ -54,7 +57,8 @@ static struct file_operations file_ops =
 	.read = device_read,
 	.write = device_write,
 	.open = device_open,
-	.release = device_release
+	.release = device_release,
+	.ioctl = my_ioctl
 };
 
 
@@ -112,7 +116,22 @@ static ssize_t device_write(struct file *flip, const char __user *buffer, size_t
     return len;
 }
 
+static long my_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
+{
+    my_ioctl_data mid;
 
+    switch(cmd) {
+        case MY_IOCTL_IN:
+            if( copy_from_user(&mid, (my_ioctl_data *) arg,
+                               sizeof(my_ioctl_data)) )
+                return -EFAULT;
+            /* process data and execute command */
+            break;
+        default:
+            return -ENOTTY;
+    }
+    return 0;
+}
 
 /* Called when a process closes our device */
 static int device_release(struct inode *inode, struct file *file) 
