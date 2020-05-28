@@ -1,4 +1,3 @@
-#include <asm/uaccess.h>
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -6,6 +5,7 @@
 #include <linux/uaccess.h>
 #include <linux/errno.h>
 #include <linux/cdev.h>
+#include <asm/uaccess.h>
 #include "Epitech_ioctl.h"
 
 
