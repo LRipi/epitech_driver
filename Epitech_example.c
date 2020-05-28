@@ -30,8 +30,8 @@ struct my_device_data {
 /* Prototypes for device functions */
 static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
-static ssize_t device_read(struct file *, char *, size_t, loff_t *);
-static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
+static ssize_t device_read(struct file *, char __user *, size_t, loff_t *);
+static ssize_t device_write(struct file *, const char __user *, size_t, loff_t *);
 
 static int major_num;
 
@@ -78,7 +78,7 @@ static int device_open(struct inode *inode, struct file *file)
 
 
 /* When a process reads from our device, this gets called. */
-static ssize_t device_read(struct file *flip, char *buffer, size_t size, loff_t *offset)
+static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, loff_t *offset)
 {
     struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
     ssize_t len = (ssize_t) min(my_data->size - (ssize_t) *offset, size);
@@ -94,7 +94,7 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t size, loff_t 
 }
 
 /* When a process writes from our device, this gets called. */
-static ssize_t device_write(struct file *flip, const char *buffer, size_t size, loff_t *offset)
+static ssize_t device_write(struct file *flip, const char __user *buffer, size_t size, loff_t *offset)
 {
     struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
     ssize_t len = min(my_data->size - *offset, size);
