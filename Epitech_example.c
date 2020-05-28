@@ -39,7 +39,11 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char __user *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char __user *, size_t, loff_t *);
-static long my_ioctl (struct file *, unsigned int, unsigned long);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35))
+static int my_ioctl(struct inode *, struct file *, unsigned int, unsigned long);
+#else
+static long my_ioctl(struct file *, unsigned int, unsigned long);
+#endif
 
 static int major_num;
 
@@ -58,7 +62,11 @@ static struct file_operations file_ops =
 	.write = device_write,
 	.open = device_open,
 	.release = device_release,
-	.ioctl = my_ioctl
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35))
+    .ioctl = my_ioctl
+#else
+    .unlocked_ioctl = my_ioctl
+#endif
 };
 
 
@@ -116,13 +124,17 @@ static ssize_t device_write(struct file *flip, const char __user *buffer, size_t
     return len;
 }
 
-static long my_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35))
+static int my_ioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg)
+#else
+static long my_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
+#endif
 {
     my_ioctl_data mid;
 
     switch(cmd) {
         case MY_IOCTL_IN:
-            if(copy_from_user(&mid, (my_ioctl_data *) arg, sizeof(my_ioctl_data)))
+            if (copy_from_user(&mid, (my_ioctl_data *) arg, sizeof(my_ioctl_data))  )
                 return -EFAULT;
             /* process data and execute command */
             break;
