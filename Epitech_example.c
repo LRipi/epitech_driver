@@ -90,6 +90,7 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
     printk(KERN_INFO "%s\n", buffer);
     if (len <= 0)
         return 0;
+    schedule();
     if (copy_to_user(buffer, msg_buffer + *offset, len))
         return -EFAULT;
     printk(KERN_INFO "%s\n", buffer);
