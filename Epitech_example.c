@@ -81,12 +81,13 @@ static int device_open(struct inode *inode, struct file *file)
 /* When a process reads from our device, this gets called. */
 static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, loff_t *offset)
 {
+    struct my_device_data *my_data = (struct my_device_data *) flip->private_data;
     ssize_t len = (ssize_t) min(size - *offset, size);
 
     printk(KERN_INFO "%lu\n", size);
     printk(KERN_INFO "%lu\n", len);
     printk(KERN_INFO "%s\n", buffer);
-    printk(KERN_INFO "%s\n", flip->private_data->buffer);
+    printk(KERN_INFO "%s\n", my_data->buffer);
     if (len <= 0)
         return 0;
     if (copy_to_user(buffer, buffer + *offset, len))
