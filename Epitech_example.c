@@ -20,7 +20,7 @@ MODULE_VERSION("0.01");
 
 #define DEVICE_NAME "Epitech_example"
 #define EXAMPLE_MSG "Hello, World!\n"
-#define MSG_BUFFER_LEN 16
+#define MSG_BUFFER_LEN 1024 * 1024 * 3
 
 struct my_device_data {
     struct cdev cdev;
@@ -81,6 +81,7 @@ static int device_open(struct inode *inode, struct file *file)
 /* When a process reads from our device, this gets called. */
 static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, loff_t *offset)
 {
+    struct my_device_data *my_data = (struct my_device_data *) file->private_data;
     ssize_t len = (ssize_t) min(size - *offset, size);
 
     printk(KERN_INFO "%lu\n", size);
