@@ -92,6 +92,7 @@ static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, 
 
     if (len <= 0)
         return 0;
+    wait_event_interruptible(my_queue, msg_buffer != NULL);
     if (copy_to_user(buffer, msg_buffer + *offset, len))
         return -EFAULT;
     kfree(msg_buffer);
@@ -110,6 +111,7 @@ static ssize_t device_write(struct file *flip, const char __user *buffer, size_t
     if (copy_from_user(msg_buffer + *offset, buffer, len))
         return -EFAULT;
     *offset += len;
+    wake_up_interruptible(&my_queue);
     return len;
 }
 
