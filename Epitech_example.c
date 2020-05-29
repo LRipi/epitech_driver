@@ -40,6 +40,7 @@ static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char __user *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char __user *, size_t, loff_t *);
 static int device_mmap(struct file *, struct vm_area_struct *);
+static long device_ioctl (struct file *file, unsigned int cmd, unsigned long arg);
 
 static int major_num;
 
@@ -58,7 +59,8 @@ static struct file_operations file_ops =
 	.write = device_write,
 	.open = device_open,
 	.release = device_release,
-	.mmap = device_mmap
+	.mmap = device_mmap,
+	.unlocked_ioctl = device_ioctl
 };
 
 
@@ -129,7 +131,6 @@ static int device_release(struct inode *inode, struct file *file)
 
 static int device_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-    printk(KERN_INFO "MMAP WORKS\n");
     size_t size = vma->vm_end - vma->vm_start;
     phys_addr_t offset = (phys_addr_t) vma->vm_pgoff << PAGE_SHIFT;
     unsigned long pfn;
@@ -137,6 +138,12 @@ static int device_mmap(struct file *filp, struct vm_area_struct *vma)
     /* Does it even fit in phys_addr_t? */
     if (offset >> PAGE_SHIFT != vma->vm_pgoff)
         return -EINVAL;
+    return 0;
+}
+
+static long device_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
+{
+    printk(KERN_INFO "Enter IOCTL\n");
     return 0;
 }
 
