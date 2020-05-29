@@ -8,7 +8,6 @@
 #include <linux/slab.h>
 #include <linux/mm.h>
 #include <asm/uaccess.h>
-#include <asm/ioctl.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
 #include <linux/delay.h>
@@ -28,11 +27,6 @@ MODULE_VERSION("0.01");
 #define EXAMPLE_MSG "Hello, World!\n"
 #define MSG_BUFFER_LEN 1024 * 1024 * 3
 
-struct my_device_data {
-    struct cdev cdev;
-    int size;
-    char msg_buffer[MSG_BUFFER_LEN];
-};
 
 /* Prototypes for device functions */
 static int device_open(struct inode *, struct file *);
@@ -43,12 +37,12 @@ static int device_mmap(struct file *, struct vm_area_struct *);
 static long device_ioctl (struct file *file, unsigned int cmd, unsigned long arg);
 
 static int major_num;
-
 static int device_open_count = 0;
-
 static char *msg_buffer;
-
 static char *msg_ptr;
+static int status = 1;
+static int dignity = 3;
+static int ego = 5;
 
 DECLARE_WAIT_QUEUE_HEAD(my_queue);
 
@@ -67,8 +61,6 @@ static struct file_operations file_ops =
 /* Called when a process opens our device */
 static int device_open(struct inode *inode, struct file *file) 
 {
-    struct my_device_data *my_data;
-
     /* If device is open, return busy */
 	if (device_open_count) 
 	{
@@ -78,17 +70,11 @@ static int device_open(struct inode *inode, struct file *file)
 	else
 	{
 		printk(KERN_ALERT "Epitech  Open \n");
-        my_data = container_of(inode->i_cdev, struct my_device_data, cdev);
-        file->private_data = my_data;
 		device_open_count++;
 	}
-
 	try_module_get(THIS_MODULE);
-
 	return 0;
 }
-
-
 
 /* When a process reads from our device, this gets called. */
 static ssize_t device_read(struct file *flip, char __user *buffer, size_t size, loff_t *offset)
@@ -144,6 +130,27 @@ static int device_mmap(struct file *filp, struct vm_area_struct *vma)
 static long device_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
 {
     printk(KERN_INFO "Enter IOCTL\n");
+    query_arg_t q;
+
+    switch (cmd)
+    {
+        case QUERY_GET_VARIABLES:
+            q.status = status;
+            q.dignity = dignity;
+            q.ego = ego;
+            if (copy_to_user((query_arg_t *)arg, &q, sizeof(query_arg_t)))
+            {
+                return -EACCES;
+            }
+            break;
+        case QUERY_CLR_VARIABLES:
+            status = 0;
+            dignity = 0;
+            ego = 0;
+            break;
+        default:
+            return -EINVAL;
+    }
     return 0;
 }
 
@@ -163,15 +170,11 @@ static int __init Epitech_example_init(void)
 
 static void __exit Epitech_example_exit(void) 
 {
-
 	/* Remember  we have to clean up after ourselves. Unregister the character device. */
 	unregister_chrdev(major_num, DEVICE_NAME);
-
 	printk(KERN_INFO "Goodbye, World!\n");
-
 }
 
 /* Register module functions */
 module_init(Epitech_example_init);
-
 module_exit(Epitech_example_exit);
